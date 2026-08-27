@@ -198,105 +198,6 @@
   updateScrollUI();
   backTop?.addEventListener("click", () => smoothTo($("#home")));
 
-  // Product modal
-  const modal = $("#productModal");
-  const modalImg = $("#modalImg");
-  const modalTitle = $("#modalTitle");
-  const modalDescription = $("#modalDescription");
-  const modalEnquireWhatsApp = $("#modalEnquireWhatsApp");
-  const whatsappNumber = "917200735352";
-  let modalTimeline;
-
-  function openModal(card) {
-    if (!modal) return;
-    const cardImage = $(".product-img img", card);
-    const imageSrc =
-      card?.dataset.image ||
-      cardImage?.getAttribute("src") ||
-      cardImage?.currentSrc ||
-      "";
-    modalImg.loading = "eager";
-    modalImg.onerror = null;
-    modalImg.removeAttribute("src");
-    modalImg.alt = card.dataset.name || "Bakery creation";
-    if (imageSrc) {
-      modalImg.src = imageSrc;
-    }
-    modalImg.onerror = () => {
-      const fallback = cardImage?.getAttribute("data-fallback");
-      if (fallback && modalImg.src !== fallback) {
-        modalImg.src = fallback;
-      }
-    };
-    const productName = card.dataset.name || "Bakery creation";
-    modalTitle.textContent = productName;
-    modalDescription.textContent = card.dataset.detail || "";
-
-    if (modalEnquireWhatsApp) {
-      const message = `Hi White Field Bakery, I'm interested in the ${productName}. Please share the details and availability.`;
-      modalEnquireWhatsApp.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    }
-
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-
-    if (hasGSAP && !reduced) {
-      modalTimeline?.kill();
-      modalTimeline = gsap
-        .timeline()
-        .fromTo(
-          ".modal-backdrop",
-          { autoAlpha: 0 },
-          { autoAlpha: 1, duration: 0.25 },
-        )
-        .fromTo(
-          ".modal-card",
-          { autoAlpha: 0, y: 30, scale: 0.96 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" },
-          "-=.05",
-        )
-        .fromTo(
-          ".modal-content > *",
-          { autoAlpha: 0, y: 10 },
-          { autoAlpha: 1, y: 0, duration: 0.28, stagger: 0.04 },
-          "-=.15",
-        );
-    }
-  }
-
-  function closeModal() {
-    if (!modal) return;
-    if (hasGSAP && !reduced && modal.classList.contains("open")) {
-      modalTimeline?.kill();
-      gsap
-        .timeline({
-          onComplete: () => {
-            modal.classList.remove("open");
-            modal.setAttribute("aria-hidden", "true");
-            document.body.classList.remove("modal-open");
-          },
-        })
-        .to(".modal-card", { autoAlpha: 0, y: 20, scale: 0.97, duration: 0.22 })
-        .to(".modal-backdrop", { autoAlpha: 0, duration: 0.18 }, "-=.1");
-    } else {
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("modal-open");
-    }
-  }
-
-  $$(".details-btn").forEach((btn) =>
-    btn.addEventListener("click", () =>
-      openModal(btn.closest(".product-card")),
-    ),
-  );
-  $(".modal-close")?.addEventListener("click", closeModal);
-  $(".modal-backdrop")?.addEventListener("click", closeModal);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
-  });
-
   // FAQ accordion
   $$(".faq-item").forEach((item) =>
     item.addEventListener("click", () => {
@@ -612,7 +513,7 @@
 
   // Hover micro-interactions
   if (!reduced && hasGSAP) {
-    $$(".btn,.category,.details-btn,.slider-btn,.back-top").forEach((el) => {
+    $$(".btn,.category,.wa-enquire,.slider-btn,.back-top").forEach((el) => {
       el.addEventListener("mouseenter", () => {
         if (!el.disabled)
           gsap.to(el, { y: -2, duration: 0.2, overwrite: true });
@@ -628,29 +529,30 @@
 })();
 
 
-/* ---- OUR SPECIAL category filter ---- */
+/* ---- OUR SPECIAL category filter (second row only) ---- */
 (() => {
   const init = () => {
-    const chips = [...document.querySelectorAll(".filter-chip")];
-    const cards = [...document.querySelectorAll(".cake-rows .product-card")];
-    const rows = [...document.querySelectorAll(".cake-row")];
-    if (!chips.length || !cards.length) return;
+    const chips = [...document.querySelectorAll(".row-filters .filter-chip")];
+    const rows = [...document.querySelectorAll(".cake-rows .cake-row")];
+    const secondRow = rows[1];
+    if (!chips.length || !secondRow) return;
+    const cards = [...secondRow.querySelectorAll(".product-card")];
 
     const apply = (filter) => {
       cards.forEach((card) => {
         const show = filter === "all" || card.dataset.category === filter;
         card.classList.toggle("is-hidden", !show);
       });
-      rows.forEach((row) => {
-        const visible = row.querySelectorAll(".product-card:not(.is-hidden)").length;
-        row.classList.toggle("is-empty", visible === 0);
-        row.scrollLeft = 0;
-        if (row._marqueeState) {
-          row._marqueeState.offset = 0;
-          row._marqueeState.dir = 1;
-          row._marqueeState.last = performance.now();
-        }
-      });
+      const visible = secondRow.querySelectorAll(
+        ".product-card:not(.is-hidden)",
+      ).length;
+      secondRow.classList.toggle("is-empty", visible === 0);
+      secondRow.scrollLeft = 0;
+      if (secondRow._marqueeState) {
+        secondRow._marqueeState.offset = 0;
+        secondRow._marqueeState.dir = 1;
+        secondRow._marqueeState.last = performance.now();
+      }
     };
 
     chips.forEach((chip) => {
@@ -667,3 +569,4 @@
     init();
   }
 })();
+

@@ -73,6 +73,9 @@ button {
   max-width: 720px;
   margin: 0 auto 52px;
 }
+#ourspecial {
+  color: var(--red);
+}
 .section-heading h2 {
   font: 700 clamp(34px, 4vw, 54px)/1.05 var(--serif);
   letter-spacing: -1.4px;
@@ -165,7 +168,7 @@ button {
 /* top announcement banner */
 .itemslist {
   font-family: var(--serif);
-  font-size: 25px;
+  font-size: 30px;
 }
 .top-banner {
   height: 36px;
@@ -228,9 +231,17 @@ button {
   bottom: 0px;
   right: 1.4%;
 }
+.location {
+  pointer-events: auto;
+  width: 65px;
+  border-radius: 10px;
+  background-color: transparent;
+  padding: 10px;
+  border-radius: 10px;
+}
 .swiggy {
   pointer-events: auto;
-  width: 60px;
+  width: 65px;
   border-radius: 10px;
   background-color: transparent;
   padding: 10px;
@@ -238,14 +249,14 @@ button {
 }
 .zomato {
   pointer-events: auto;
-  width: 56px;
+  width: 61px;
   background-color: transparent;
   padding: 5px;
   border-radius: 10px;
 }
 .whatsapp {
   pointer-events: auto;
-  width: 55px;
+  width: 60px;
   background-color: transparent;
   padding: 7px;
   border-radius: 10px;
@@ -843,9 +854,9 @@ button {
   }
 
   .product-card {
-    flex: 0 0 86vw;
-    min-width: 86vw;
-    max-width: 400px;
+    flex: 0 0 78vw;
+    min-width: 78vw;
+    max-width: 460px;
   }
 
   .product-img {
@@ -1678,6 +1689,36 @@ button {
     flex-basis: 210px;
     min-width: 210px;
   }
+  .location {
+    pointer-events: auto;
+    width: 60px;
+    border-radius: 10px;
+    background-color: transparent;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .swiggy {
+    pointer-events: auto;
+    width: 60px;
+    border-radius: 10px;
+    background-color: transparent;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .zomato {
+    pointer-events: auto;
+    width: 56px;
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 10px;
+  }
+  .whatsapp {
+    pointer-events: auto;
+    width: 55px;
+    background-color: transparent;
+    padding: 7px;
+    border-radius: 10px;
+  }
 
   .container {
     width: calc(100% - 24px);
@@ -1751,7 +1792,7 @@ button {
     gap: 10px;
   }
   .product-img {
-    height: 155px;
+    height: 280px;
   }
   .product-info {
     padding: 12px;
@@ -1927,7 +1968,7 @@ body {
   }
 
   .hero-copy {
-    padding-top: 52px;
+    padding-top: 42px;
     padding-bottom: 24px;
   }
 
@@ -2215,5 +2256,51 @@ body {
   .filter-chip {
     font-size: 13px;
     padding: 9px 16px;
+  }
+}
+
+/* ---- Our Special: WhatsApp enquiry cards + second-row filter ---- */
+.wa-enquire {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 15px 18px;
+  background: var(--red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition:
+    background 0.28s ease,
+    transform 0.28s ease;
+}
+.wa-enquire span {
+  font-size: 15px;
+}
+.wa-enquire:hover {
+  background: var(--red-dark);
+}
+
+/* filter chips sit centered between the two rows, above row 2 */
+.menu-filters.row-filters {
+  margin: 6px 0 2px;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  /* bigger, square cake images on mobile */
+  .product-card {
+    flex: 0 0 78vw;
+    min-width: 78vw;
+    max-width: 460px;
+  }
+  .product-img {
+    aspect-ratio: 1 / 1;
+  }
+  .wa-enquire {
+    padding: 14px 16px;
+    font-size: 12.5px;
   }
 }
