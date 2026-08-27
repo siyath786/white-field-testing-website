@@ -1,0 +1,628 @@
+/* ---- Automatic back-and-forth slide for the two "Our Special" cake rows ----
+   Row 1 starts right -> left, row 2 starts left -> right; each row reverses
+   direction when it reaches an end, so both keep sliding both ways.
+   Hovering (desktop) or touching (mobile) a row pauses that row only;
+   touching a different row resumes the first one, just like hover does. */
+(() => {
+  const SPEED = 55; // px per second — steady pace, not too fast or slow
+
+  const startMarquee = () => {
+    const rows = [...document.querySelectorAll(".cake-row")];
+    if (!rows.length) return;
+
+    rows.forEach((row, index) => {
+      row.style.scrollSnapType = "none";
+
+      const state = {
+        dir: index % 2 === 0 ? 1 : -1, // row 1 moves content right->left, row 2 left->right
+        offset:
+          index % 2 === 0 ? 0 : Math.max(row.scrollWidth - row.clientWidth, 0),
+        last: performance.now(),
+        paused: false,
+      };
+      row.scrollLeft = state.offset;
+      row._marqueeState = state; // expose state so touch handling below can reach it
+
+      const step = (now) => {
+        const dt = Math.min((now - state.last) / 1000, 0.05);
+        state.last = now;
+        const max = row.scrollWidth - row.clientWidth;
+        if (max > 0 && !state.paused) {
+          state.offset += state.dir * SPEED * dt;
+          if (state.offset >= max) {
+            state.offset = max;
+            state.dir = -1;
+          }
+          if (state.offset <= 0) {
+            state.offset = 0;
+            state.dir = 1;
+          }
+          row.scrollLeft = state.offset;
+        }
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+
+      const pause = () => {
+        state.paused = true;
+      };
+      const resume = () => {
+        state.paused = false;
+        state.last = performance.now();
+      };
+      row.addEventListener("mouseenter", pause);
+      row.addEventListener("mouseleave", resume);
+    });
+
+    // Mobile: touching a row pauses only that row; touching a different
+    // row resumes any previously-paused row, mirroring desktop hover.
+    rows.forEach((row) => {
+      row.addEventListener(
+        "touchstart",
+        () => {
+          rows.forEach((r) => {
+            r._marqueeState.paused = r === row;
+            if (r !== row) r._marqueeState.last = performance.now();
+          });
+        },
+        { passive: true },
+      );
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startMarquee);
+  } else {
+    startMarquee();
+  }
+})();
+
+(() => {
+  "use strict";
+
+  const $ = (s, p = document) => p.querySelector(s);
+  const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasGSAP = typeof window.gsap !== "undefined";
+  const hasST = hasGSAP && typeof window.ScrollTrigger !== "undefined";
+  const hasScrollTo = hasGSAP && typeof window.ScrollToPlugin !== "undefined";
+
+  if (hasST) gsap.registerPlugin(ScrollTrigger);
+  if (hasScrollTo) gsap.registerPlugin(ScrollToPlugin);
+
+  // Loader
+  const loader = $("#pageLoader");
+  const hideLoader = () => {
+    if (!loader) return;
+    if (hasGSAP && !reduced) {
+      gsap
+        .timeline()
+        .to(".loader-ring", {
+          rotation: 360,
+          duration: 0.6,
+          ease: "power2.inOut",
+        })
+        .to(loader, {
+          autoAlpha: 0,
+          duration: 0.65,
+          ease: "power2.out",
+          onComplete: () => loader.remove(),
+        });
+    } else {
+      loader.remove();
+    }
+  };
+  window.addEventListener("load", () => setTimeout(hideLoader, 450));
+
+  // Mobile navigation
+  const menuToggle = $(".menu-toggle");
+  const nav = $(".nav");
+  const navLinks = $$(".nav a");
+  menuToggle?.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
+    menuToggle.setAttribute("aria-expanded", String(open));
+    if (hasGSAP && !reduced) {
+      gsap.to(nav, {
+        autoAlpha: open ? 1 : 0,
+        y: open ? 0 : -8,
+        duration: 0.25,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    }
+  });
+
+  // Smooth navigation — includes ScrollToPlugin when GSAP is available.
+  function smoothTo(target) {
+    if (!target) return;
+    const header = $(".site-header");
+    const y =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      (header?.offsetHeight || 0) -
+      8;
+    if (hasScrollTo && !reduced) {
+      gsap.to(window, {
+        duration: 1.05,
+        scrollTo: { y, autoKill: true },
+        ease: "power3.inOut",
+      });
+    } else {
+      window.scrollTo({
+        top: Math.max(0, y),
+        behavior: reduced ? "auto" : "smooth",
+      });
+    }
+  }
+
+  $$('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const target = $(link.getAttribute("href"));
+      if (!target) return;
+      e.preventDefault();
+      nav?.classList.remove("open");
+      menuToggle?.setAttribute("aria-expanded", "false");
+      smoothTo(target);
+      history.replaceState?.(null, "", link.getAttribute("href"));
+    });
+  });
+
+  // Active nav
+  const sections = $$("main section[id]");
+  const setActive = (id) =>
+    navLinks.forEach((a) => {
+      const active = a.getAttribute("href") === `#${id}`;
+      a.classList.toggle("active", active);
+      a.setAttribute("aria-current", active ? "page" : "false");
+    });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    },
+    { rootMargin: "-35% 0px -55% 0px" },
+  );
+  sections.forEach((s) => observer.observe(s));
+
+  // Scroll progress + back-to-top
+  const progress = $("#scrollProgress");
+  const backTop = $("#backTop");
+  const updateScrollUI = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    if (progress) progress.style.width = `${pct}%`;
+    if (backTop) backTop.classList.toggle("visible", window.scrollY > 650);
+  };
+  window.addEventListener("scroll", updateScrollUI, { passive: true });
+  updateScrollUI();
+  backTop?.addEventListener("click", () => smoothTo($("#home")));
+
+  // Product modal
+  const modal = $("#productModal");
+  const modalImg = $("#modalImg");
+  const modalTitle = $("#modalTitle");
+  const modalDescription = $("#modalDescription");
+  const modalEnquireWhatsApp = $("#modalEnquireWhatsApp");
+  const whatsappNumber = "917200735352";
+  let modalTimeline;
+
+  function openModal(card) {
+    if (!modal) return;
+    const cardImage = $(".product-img img", card);
+    const imageSrc =
+      card?.dataset.image ||
+      cardImage?.getAttribute("src") ||
+      cardImage?.currentSrc ||
+      "";
+    modalImg.loading = "eager";
+    modalImg.onerror = null;
+    modalImg.removeAttribute("src");
+    modalImg.alt = card.dataset.name || "Bakery creation";
+    if (imageSrc) {
+      modalImg.src = imageSrc;
+    }
+    modalImg.onerror = () => {
+      const fallback = cardImage?.getAttribute("data-fallback");
+      if (fallback && modalImg.src !== fallback) {
+        modalImg.src = fallback;
+      }
+    };
+    const productName = card.dataset.name || "Bakery creation";
+    modalTitle.textContent = productName;
+    modalDescription.textContent = card.dataset.detail || "";
+
+    if (modalEnquireWhatsApp) {
+      const message = `Hi White Field Bakery, I'm interested in the ${productName}. Please share the details and availability.`;
+      modalEnquireWhatsApp.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    }
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+
+    if (hasGSAP && !reduced) {
+      modalTimeline?.kill();
+      modalTimeline = gsap
+        .timeline()
+        .fromTo(
+          ".modal-backdrop",
+          { autoAlpha: 0 },
+          { autoAlpha: 1, duration: 0.25 },
+        )
+        .fromTo(
+          ".modal-card",
+          { autoAlpha: 0, y: 30, scale: 0.96 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" },
+          "-=.05",
+        )
+        .fromTo(
+          ".modal-content > *",
+          { autoAlpha: 0, y: 10 },
+          { autoAlpha: 1, y: 0, duration: 0.28, stagger: 0.04 },
+          "-=.15",
+        );
+    }
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    if (hasGSAP && !reduced && modal.classList.contains("open")) {
+      modalTimeline?.kill();
+      gsap
+        .timeline({
+          onComplete: () => {
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+          },
+        })
+        .to(".modal-card", { autoAlpha: 0, y: 20, scale: 0.97, duration: 0.22 })
+        .to(".modal-backdrop", { autoAlpha: 0, duration: 0.18 }, "-=.1");
+    } else {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+  }
+
+  $$(".details-btn").forEach((btn) =>
+    btn.addEventListener("click", () =>
+      openModal(btn.closest(".product-card")),
+    ),
+  );
+  $(".modal-close")?.addEventListener("click", closeModal);
+  $(".modal-backdrop")?.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
+  // FAQ accordion
+  $$(".faq-item").forEach((item) =>
+    item.addEventListener("click", () => {
+      const wasOpen = item.classList.contains("open");
+      $$(".faq-item").forEach((other) => {
+        other.classList.remove("open");
+        other.setAttribute("aria-expanded", "false");
+      });
+      if (!wasOpen) {
+        item.classList.add("open");
+        item.setAttribute("aria-expanded", "true");
+      }
+    }),
+  );
+
+  // Reviews slider
+  const reviews = $$(".review-card");
+  const dotsWrap = $(".review-dots");
+  let reviewIndex = 0;
+  reviews.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.className = `review-dot${i === 0 ? " active" : ""}`;
+    dot.setAttribute("aria-label", `Show review ${i + 1}`);
+    dot.addEventListener("click", () => showReview(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = $$(".review-dot");
+
+  function showReview(i) {
+    reviewIndex = (i + reviews.length) % reviews.length;
+    reviews.forEach((card, idx) => {
+      card.classList.toggle("active", idx === reviewIndex);
+      if (hasGSAP && !reduced) {
+        gsap.to(card, {
+          autoAlpha: idx === reviewIndex ? 1 : 0,
+          y: idx === reviewIndex ? 0 : 15,
+          duration: 0.35,
+          overwrite: true,
+        });
+      }
+    });
+    dots.forEach((dot, idx) =>
+      dot.classList.toggle("active", idx === reviewIndex),
+    );
+  }
+  $(".prev")?.addEventListener("click", () => showReview(reviewIndex - 1));
+  $(".next")?.addEventListener("click", () => showReview(reviewIndex + 1));
+
+  // GSAP scroll reveal animations
+  function initAnimations() {
+    if (!hasGSAP || reduced) return;
+
+    const revealGroups = [
+      [".trust-item", { y: 28 }],
+      [".story-visual", { x: -50 }],
+      [".story-copy", { x: 50 }],
+      [".process-card", { y: 35 }],
+      [".gallery-item", { y: 35 }],
+      [".faq-intro", { x: -35 }],
+      [".faq-list", { x: 35 }],
+      [".footer-title, .footer-item", { y: 25 }],
+    ];
+
+    revealGroups.forEach(([selector, from]) => {
+      $$(selector).forEach((el) => {
+        gsap.fromTo(
+          el,
+          { ...from, autoAlpha: 0 },
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.72,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 88%", once: true },
+          },
+        );
+      });
+    });
+
+    $$(".section-heading").forEach((heading) => {
+      gsap.fromTo(
+        heading.children,
+        { y: 22, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.55,
+          stagger: 0.07,
+          ease: "power3.out",
+          scrollTrigger: { trigger: heading, start: "top 86%", once: true },
+        },
+      );
+    });
+
+    // Hero opening animation — smooth text reveal + cake image entrance.
+    // The mobile x-offset is intentionally smaller so the image never causes
+    // a horizontal overflow while it animates into place.
+    const isMobileHero = window.matchMedia("(max-width: 560px)").matches;
+    const heroImageX = isMobileHero ? 32 : 80;
+
+    gsap.set(".hero h1", { transformOrigin: "left center" });
+
+    gsap
+      .timeline({ defaults: { ease: "power3.out" } })
+      .fromTo(
+        ".site-header",
+        { y: -20, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.55 },
+      )
+      .fromTo(
+        ".hero .eyebrow",
+        { y: 16, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.38 },
+        "-=.18",
+      )
+      .fromTo(
+        ".hero h1",
+        { y: 30, autoAlpha: 0, scale: 0.985 },
+        { y: 0, autoAlpha: 1, scale: 1, duration: 0.68, ease: "power4.out" },
+        "-=.18",
+      )
+      .fromTo(
+        ".hero-text",
+        { y: 18, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.45 },
+        "-=.30",
+      )
+      .fromTo(
+        ".hero-actions",
+        { y: 14, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.42 },
+        "-=.22",
+      )
+      .fromTo(
+        ".hero-points",
+        { y: 14, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.42 },
+        "-=.24",
+      )
+      .fromTo(
+        ".hero-image-wrap",
+        { x: heroImageX, scale: 0.94, autoAlpha: 0 },
+        { x: 0, scale: 1, autoAlpha: 1, duration: 0.95, ease: "power4.out" },
+        "-=.72",
+      )
+      .fromTo(
+        ".hero-glow",
+        { autoAlpha: 0, scale: 0.82 },
+        { autoAlpha: 1, scale: 1, duration: 0.8, ease: "power2.out" },
+        "-=.75",
+      )
+      .fromTo(
+        ".hero-orbit",
+        { autoAlpha: 0, scale: 0.92 },
+        { autoAlpha: 1, scale: 1, duration: 0.65, stagger: 0.08 },
+        "-=.55",
+      );
+
+    // Our Special: two-row entrance with a gentle stagger.
+    $$(".cake-row").forEach((row, rowIndex) => {
+      gsap.fromTo(
+        row.querySelectorAll(".product-card"),
+        { y: 28, autoAlpha: 0, scale: 0.985 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.68,
+          stagger: 0.075,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: row,
+            start: "top 86%",
+            once: true,
+          },
+        },
+      );
+    });
+
+    // Very subtle floating motion after the opening sequence.
+    gsap.to(".hero-image-wrap", {
+      y: -5,
+      duration: 3.8,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+
+    gsap.to(".hero-glow", {
+      x: -22,
+      y: 18,
+      scale: 1.05,
+      duration: 5.5,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+    gsap.to(".hero-stamp", {
+      y: 10,
+      rotation: 14,
+      duration: 3.8,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+    gsap.to(".hero-card", {
+      y: -9,
+      duration: 3.2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+
+    // ---- Extra scroll-driven GSAP animations ----
+
+    // Scroll progress bar at the top of the page.
+    const bar = document.createElement("div");
+    bar.className = "scroll-progress";
+    document.body.appendChild(bar);
+    gsap.fromTo(
+      bar,
+      { scaleX: 0 },
+      {
+        scaleX: 1,
+        ease: "none",
+        transformOrigin: "left center",
+        scrollTrigger: {
+          start: 0,
+          end: () => document.body.scrollHeight - window.innerHeight,
+          scrub: 0.3,
+        },
+      },
+    );
+
+    // Header condenses once the page is scrolled.
+    ScrollTrigger.create({
+      start: "top -80",
+      onUpdate: (self) =>
+        document
+          .querySelector(".site-header")
+          ?.classList.toggle("scrolled", self.scroll() > 80),
+    });
+
+    // Each cake row drifts in from an alternating side while scrolling.
+    $$(".cake-row").forEach((row, i) => {
+      gsap.fromTo(
+        row,
+        { x: i % 2 ? 60 : -60 },
+        {
+          x: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: row,
+            start: "top 95%",
+            end: "top 55%",
+            scrub: 0.6,
+          },
+        },
+      );
+    });
+
+    // Gentle parallax on the story and hero imagery.
+    $$(".story-frame img, .about-visual img").forEach((img) => {
+      gsap.fromTo(
+        img,
+        { yPercent: -6 },
+        {
+          yPercent: 6,
+          ease: "none",
+          scrollTrigger: {
+            trigger: img,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.8,
+          },
+        },
+      );
+    });
+
+    // Section headings get a soft scrub fade as they leave the viewport.
+    $$("main section[id]").forEach((section) => {
+      gsap.fromTo(
+        section,
+        { autoAlpha: 0.85 },
+        {
+          autoAlpha: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 0.5,
+          },
+        },
+      );
+    });
+
+    $$(".gallery-item img").forEach((img) => {
+      gsap.to(img, {
+        yPercent: -5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: img.closest(".gallery-item"),
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+    });
+  }
+
+  // Hover micro-interactions
+  if (!reduced && hasGSAP) {
+    $$(".btn,.category,.details-btn,.slider-btn,.back-top").forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        if (!el.disabled)
+          gsap.to(el, { y: -2, duration: 0.2, overwrite: true });
+      });
+      el.addEventListener("mouseleave", () =>
+        gsap.to(el, { y: 0, duration: 0.22, overwrite: true }),
+      );
+    });
+  }
+
+  $("#year").textContent = new Date().getFullYear();
+  initAnimations();
+})();
