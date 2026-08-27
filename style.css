@@ -267,8 +267,8 @@ button {
   justify-content: space-between;
 }
 .brand {
-  width: 150px;
-  height: 150px;
+  width: 170px;
+  height: 170px;
   z-index: 2;
   position: relative;
   display: flex;
@@ -1982,8 +1982,8 @@ body {
     min-width: 210px;
   }
   .brand {
-    width: 100px;
-    height: 100px;
+    width: 140px;
+    height: 140px;
     z-index: 2;
     position: relative;
     display: flex;
@@ -2049,7 +2049,7 @@ body {
     width: 100%;
     min-width: 0;
     justify-content: space-around;
-    padding: 0 10px;
+    padding: 0 20px;
     gap: 8px;
     flex-direction: column;
   }
@@ -2170,4 +2170,50 @@ body {
 .site-header.scrolled {
   box-shadow: 0 10px 30px rgba(71, 22, 34, 0.12);
   backdrop-filter: blur(8px);
+}
+
+/* menu filters */
+.menu-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 34px;
+}
+.filter-chip {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 22px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.filter-chip:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+.filter-chip.is-active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(195, 25, 63, 0.22);
+}
+.product-card.is-hidden {
+  display: none !important;
+}
+.cake-row.is-empty {
+  display: none;
+}
+@media (max-width: 640px) {
+  .menu-filters {
+    gap: 8px;
+    margin-bottom: 26px;
+  }
+  .filter-chip {
+    font-size: 13px;
+    padding: 9px 16px;
+  }
 }

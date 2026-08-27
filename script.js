@@ -626,3 +626,44 @@
   $("#year").textContent = new Date().getFullYear();
   initAnimations();
 })();
+
+
+/* ---- OUR SPECIAL category filter ---- */
+(() => {
+  const init = () => {
+    const chips = [...document.querySelectorAll(".filter-chip")];
+    const cards = [...document.querySelectorAll(".cake-rows .product-card")];
+    const rows = [...document.querySelectorAll(".cake-row")];
+    if (!chips.length || !cards.length) return;
+
+    const apply = (filter) => {
+      cards.forEach((card) => {
+        const show = filter === "all" || card.dataset.category === filter;
+        card.classList.toggle("is-hidden", !show);
+      });
+      rows.forEach((row) => {
+        const visible = row.querySelectorAll(".product-card:not(.is-hidden)").length;
+        row.classList.toggle("is-empty", visible === 0);
+        row.scrollLeft = 0;
+        if (row._marqueeState) {
+          row._marqueeState.offset = 0;
+          row._marqueeState.dir = 1;
+          row._marqueeState.last = performance.now();
+        }
+      });
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((c) => c.classList.toggle("is-active", c === chip));
+        apply(chip.dataset.filter);
+      });
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
