@@ -1966,7 +1966,7 @@ body {
   .hero-image-wrap {
     width: min(94%, 520px);
     height: 300px;
-    border-radius: 150px 0 0 150px;
+    border-radius: 100px 0 0 100px;
     bottom: 20px;
   }
 
