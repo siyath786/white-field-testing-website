@@ -134,10 +134,18 @@ button {
   width: 84px;
   height: 84px;
   object-fit: cover;
-  border-radius: 50%;
   background: #fff;
   position: relative;
+  bottom: 0px;
   z-index: 2;
+  border-radius: 50%;
+}
+
+#whitelogo {
+  width: 180px;
+  height: 180px;
+  position: absolute;
+  margin-top: 120px;
 }
 .loader-ring {
   position: absolute;
@@ -151,6 +159,7 @@ button {
   bottom: 12%;
   font: 26px var(--script);
   opacity: 0.9;
+  transform: translateY(50px);
 }
 
 /* progress */
@@ -404,6 +413,14 @@ button {
   overflow: hidden;
   background: linear-gradient(112deg, #fff 0%, #fff 48%, #fff5f2 100%);
   min-height: 720px;
+}
+#mainhone {
+  font-size: 60px;
+  font-weight: 500;
+}
+#mainhtwo {
+  font-size: 40px;
+  font-weight: 900;
 }
 .hero-noise {
   position: absolute;
@@ -1026,7 +1043,7 @@ button {
 .customcake a {
   color: white;
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: 18px;
   background-color: var(--red);
   padding-top: 15px;
   padding-bottom: 15px;
@@ -1035,7 +1052,11 @@ button {
   font-weight: bold;
   border-radius: 10px;
 }
-
+.customcake a i {
+  font-size: 22px;
+  transform: translateY(2px);
+  margin-left: 2px;
+}
 /* experience */
 .experience {
   background: var(--red-deep);
@@ -1347,12 +1368,42 @@ button {
 .footer {
   background: #65051c;
   color: #fff;
-  padding: 65px 0 20px;
+  padding: 20px 0 30px;
+  width: 100%;
 }
 .footer-grid {
+  width: 85%;
   display: grid;
   grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  gap: 20px;
+}
+.btn-primary1 {
+  font-size: 50px;
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 10px 24px rgba(195, 25, 63, 0.2);
+  margin-top: 20px;
+}
+#btn1 {
+  font-size: 15px;
+  background-color: white;
+  color: var(--red);
+}
+.footer-title1 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 30px;
+  padding-bottom: 30px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.167);
+}
+.footer-title1 img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #fff;
 }
 .footer-title img {
   width: 70px;
@@ -1364,7 +1415,7 @@ button {
 }
 .footer-title h2 {
   font: 700 30px/1.12 var(--serif);
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 .footer-title p {
   font-size: 12px;
@@ -1392,7 +1443,7 @@ button {
   margin: 0 0 10px;
 }
 .footer-item p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
   margin: 0 0 6px;
   color: rgba(255, 255, 255, 0.78);
@@ -1401,7 +1452,7 @@ button {
   opacity: 0.7;
 }
 .footer-item a {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   color: #ffd6e0;
 }
@@ -1413,6 +1464,11 @@ button {
   justify-content: space-between;
   font-size: 9px;
   opacity: 0.65;
+}
+.msg-wa i {
+  font-size: 14px;
+  margin-left: 1px;
+  transform: translateY(1.3px);
 }
 
 /* modal */
@@ -1685,6 +1741,14 @@ button {
   }
 }
 @media (max-width: 560px) {
+  #mainhone {
+    font-size: 40px;
+    font-weight: 400;
+  }
+  #mainhtwo {
+    font-size: 30px;
+    font-weight: 900;
+  }
   .product-grid .product-card {
     flex-basis: 210px;
     min-width: 210px;
@@ -1870,6 +1934,31 @@ button {
     flex-direction: column;
     gap: 7px;
   }
+
+  .footer-title1 {
+    width: 98%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.167);
+    margin-top: 20px;
+  }
+
+  .footerpic {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: #fff;
+    margin-bottom: 10px;
+    margin-left: 15px;
+  }
+  .footerhone {
+    font: 700 26px/1.12 var(--sans);
+    margin: 0 0 8px;
+  }
+
   .modal-card {
     grid-template-columns: 1fr;
     max-height: 90vh;
@@ -2268,7 +2357,7 @@ body {
   padding: 15px 18px;
   background: var(--red);
   color: #fff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.4px;
   text-transform: uppercase;
@@ -2281,6 +2370,9 @@ body {
 }
 .wa-enquire:hover {
   background: var(--red-dark);
+}
+.wa-enquire i {
+  font-size: 20px;
 }
 
 /* filter chips sit centered between the two rows, above row 2 */

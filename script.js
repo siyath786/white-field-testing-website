@@ -118,18 +118,44 @@
   const menuToggle = $(".menu-toggle");
   const nav = $(".nav");
   const navLinks = $$(".nav a");
-  menuToggle?.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
+  const setNavState = (open) => {
+    if (!nav || !menuToggle) return;
+    nav.classList.toggle("open", open);
     menuToggle.setAttribute("aria-expanded", String(open));
     if (hasGSAP && !reduced) {
-      gsap.to(nav, {
-        autoAlpha: open ? 1 : 0,
-        y: open ? 0 : -8,
-        duration: 0.25,
-        ease: "power2.out",
-        overwrite: true,
-      });
+      gsap.killTweensOf(nav);
+      if (open) {
+        gsap.set(nav, {
+          clearProps: "opacity,visibility,transform,pointerEvents",
+        });
+        gsap.fromTo(
+          nav,
+          { autoAlpha: 0, y: -8 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.25,
+            ease: "power2.out",
+            overwrite: true,
+          },
+        );
+      } else {
+        gsap.to(nav, {
+          autoAlpha: 0,
+          y: -8,
+          duration: 0.25,
+          ease: "power2.out",
+          overwrite: true,
+          onComplete: () =>
+            gsap.set(nav, {
+              clearProps: "opacity,visibility,transform,pointerEvents",
+            }),
+        });
+      }
     }
+  };
+  menuToggle?.addEventListener("click", () => {
+    setNavState(!nav?.classList.contains("open"));
   });
 
   // Smooth navigation — includes ScrollToPlugin when GSAP is available.
@@ -160,8 +186,7 @@
       const target = $(link.getAttribute("href"));
       if (!target) return;
       e.preventDefault();
-      nav?.classList.remove("open");
-      menuToggle?.setAttribute("aria-expanded", "false");
+      setNavState(false);
       smoothTo(target);
       history.replaceState?.(null, "", link.getAttribute("href"));
     });
@@ -524,10 +549,10 @@
     });
   }
 
-  $("#year").textContent = new Date().getFullYear();
+  const year = $("#year");
+  if (year) year.textContent = new Date().getFullYear();
   initAnimations();
 })();
-
 
 /* ---- OUR SPECIAL category filter (second row only) ---- */
 (() => {
@@ -569,4 +594,3 @@
     init();
   }
 })();
-
