@@ -19,7 +19,6 @@
 }
 html {
   scroll-behavior: auto;
-  overflow-x: clip;
 }
 body {
   margin: 0;
@@ -27,6 +26,7 @@ body {
   background: #fff;
   font-family: var(--sans);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 body.modal-open {
   overflow: hidden;
@@ -1989,12 +1989,10 @@ button {
 /* =========================================================
    MOBILE HERO OVERFLOW FIX + POLISHED RESPONSIVE LAYOUT
    ========================================================= */
-html {
-  max-width: 100%;
-  overflow-x: clip;
-}
+html,
 body {
   max-width: 100%;
+  overflow-x: clip;
 }
 
 .hero,
