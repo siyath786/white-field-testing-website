@@ -1989,7 +1989,9 @@ button {
 /* =========================================================
    MOBILE HERO OVERFLOW FIX + POLISHED RESPONSIVE LAYOUT
    ========================================================= */
-html,
+html {
+  max-width: 100%;
+}
 body {
   max-width: 100%;
   overflow-x: clip;
