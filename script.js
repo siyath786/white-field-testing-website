@@ -112,105 +112,85 @@
       loader.remove();
     }
   };
-  // iOS FIX: Safari may never fire "load" if one image/font stalls, leaving the
-  // full-screen loader on top and blocking every tap. Always hide it.
   window.addEventListener("load", () => setTimeout(hideLoader, 450));
-  setTimeout(hideLoader, 2500);
 
   // Mobile navigation
   const menuToggle = $(".menu-toggle");
   const nav = $(".nav");
   const navLinks = $$(".nav a");
-  // iOS FIX: no GSAP autoAlpha here. An interrupted tween can leave inline
-  // visibility:hidden / opacity:0 on the menu, which Safari keeps forever, so
-  // the toggle looks dead. CSS classes + transitions only.
   const setNavState = (open) => {
     if (!nav || !menuToggle) return;
-    if (hasGSAP) gsap.killTweensOf(nav);
-    nav.removeAttribute("style");
     nav.classList.toggle("open", open);
     menuToggle.setAttribute("aria-expanded", String(open));
-    document.body.classList.toggle("nav-open", open);
+    if (hasGSAP && !reduced) {
+      gsap.killTweensOf(nav);
+      if (open) {
+        gsap.set(nav, {
+          clearProps: "opacity,visibility,transform,pointerEvents",
+        });
+        gsap.fromTo(
+          nav,
+          { autoAlpha: 0, y: -8 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.25,
+            ease: "power2.out",
+            overwrite: true,
+          },
+        );
+      } else {
+        gsap.to(nav, {
+          autoAlpha: 0,
+          y: -8,
+          duration: 0.25,
+          ease: "power2.out",
+          overwrite: true,
+          onComplete: () =>
+            gsap.set(nav, {
+              clearProps: "opacity,visibility,transform,pointerEvents",
+            }),
+        });
+      }
+    }
   };
-
-  menuToggle?.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  menuToggle?.addEventListener("click", () => {
     setNavState(!nav?.classList.contains("open"));
-  });
-  document.addEventListener("click", (e) => {
-    if (!nav?.classList.contains("open")) return;
-    if (nav.contains(e.target) || menuToggle?.contains(e.target)) return;
-    setNavState(false);
   });
 
   // Smooth navigation — includes ScrollToPlugin when GSAP is available.
-  // iOS FIX: read/write scroll through document.scrollingElement and fall back
-  // to an instant jump — older iPhone Safari ignores {behavior:"smooth"}.
-  const scroller = () => document.scrollingElement || document.documentElement;
   function smoothTo(target) {
     if (!target) return;
     const header = $(".site-header");
-    const current = window.pageYOffset || scroller().scrollTop || 0;
-    const y = Math.max(
-      0,
+    const y =
       target.getBoundingClientRect().top +
-        current -
-        (header?.offsetHeight || 0) -
-        8,
-    );
+      window.scrollY -
+      (header?.offsetHeight || 0) -
+      8;
     if (hasScrollTo && !reduced) {
       gsap.to(window, {
         duration: 1.05,
         scrollTo: { y, autoKill: true },
         ease: "power3.inOut",
       });
-      return;
+    } else {
+      window.scrollTo({
+        top: Math.max(0, y),
+        behavior: reduced ? "auto" : "smooth",
+      });
     }
-    try {
-      window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
-    } catch (err) {
-      window.scrollTo(0, y);
-    }
-    // WebKit (Safari AND Chrome on iPhone) may ignore the request entirely.
-    // Escalate: scrollingElement -> body -> scrollIntoView.
-    setTimeout(() => {
-      const moved = () =>
-        Math.abs(
-          (window.pageYOffset || scroller().scrollTop || 0) - current,
-        ) > 2;
-      if (moved()) return;
-      scroller().scrollTop = y;
-      if (moved()) return;
-      document.body.scrollTop = y;
-      if (moved()) return;
-      target.scrollIntoView({ block: "start" });
-    }, 300);
   }
 
-  // Delegated so it also covers links rendered later, and so a stray
-  // stopPropagation on a child element cannot swallow the tap on iOS.
-  document.addEventListener(
-    "click",
-    (e) => {
-      const link = e.target?.closest?.('a[href^="#"]');
-      if (!link) return;
-      const href = link.getAttribute("href");
-      if (!href || href === "#") return;
-      let target = null;
-      try {
-        target = document.getElementById(href.slice(1)) || $(href);
-      } catch (err) {
-        target = null;
-      }
+  $$('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const target = $(link.getAttribute("href"));
       if (!target) return;
       e.preventDefault();
       setNavState(false);
       smoothTo(target);
-      history.replaceState?.(null, "", href);
-    },
-    true,
-  );
+      history.replaceState?.(null, "", link.getAttribute("href"));
+    });
+  });
 
   // Active nav
   const sections = $$("main section[id]");

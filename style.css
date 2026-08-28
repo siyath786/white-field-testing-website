@@ -1989,15 +1989,10 @@ button {
 /* =========================================================
    MOBILE HERO OVERFLOW FIX + POLISHED RESPONSIVE LAYOUT
    ========================================================= */
-/* iOS FIX: never put overflow-x on <html> — Safari on iPhone then treats
-   <html> as the scroll container, which kills window.scrollTo()/anchor
-   links and breaks position: sticky (the header/menu). Clip on <body> only. */
-html {
-  max-width: 100%;
-}
+html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .hero,
@@ -2400,35 +2395,4 @@ body {
     padding: 14px 16px;
     font-size: 12.5px;
   }
-}
-
-
-/* ============ iOS / iPhone fixes ============ */
-.menu-toggle {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-}
-.nav a,
-.btn,
-a[href^="#"] {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-@media (max-width: 900px) {
-  .nav {
-    z-index: 120;
-    -webkit-transform: translateY(-8px);
-    transition:
-      opacity 0.25s ease,
-      transform 0.25s ease,
-      visibility 0.25s ease;
-  }
-  .nav.open {
-    -webkit-transform: none;
-  }
-}
-/* anchor targets clear the sticky header on iOS */
-section[id] {
-  scroll-margin-top: 120px;
 }
