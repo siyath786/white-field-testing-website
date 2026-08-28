@@ -122,39 +122,23 @@
     if (!nav || !menuToggle) return;
     nav.classList.toggle("open", open);
     menuToggle.setAttribute("aria-expanded", String(open));
-    if (hasGSAP && !reduced) {
+    // Clear any GSAP inline styles so iOS uses CSS pointer-events/visibility
+    if (hasGSAP) {
       gsap.killTweensOf(nav);
-      if (open) {
-        gsap.set(nav, {
-          clearProps: "opacity,visibility,transform,pointerEvents",
-        });
+      gsap.set(nav, {
+        clearProps: "opacity,visibility,transform,pointerEvents",
+      });
+      if (open && !reduced) {
         gsap.fromTo(
           nav,
-          { autoAlpha: 0, y: -8 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.25,
-            ease: "power2.out",
-            overwrite: true,
-          },
+          { y: -8 },
+          { y: 0, duration: 0.25, ease: "power2.out", overwrite: true },
         );
-      } else {
-        gsap.to(nav, {
-          autoAlpha: 0,
-          y: -8,
-          duration: 0.25,
-          ease: "power2.out",
-          overwrite: true,
-          onComplete: () =>
-            gsap.set(nav, {
-              clearProps: "opacity,visibility,transform,pointerEvents",
-            }),
-        });
       }
     }
   };
-  menuToggle?.addEventListener("click", () => {
+  menuToggle?.addEventListener("click", (e) => {
+    e.preventDefault();
     setNavState(!nav?.classList.contains("open"));
   });
 
@@ -167,7 +151,10 @@
       window.scrollY -
       (header?.offsetHeight || 0) -
       8;
-    if (hasScrollTo && !reduced) {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (hasScrollTo && !reduced && !isIOS) {
       gsap.to(window, {
         duration: 1.05,
         scrollTo: { y, autoKill: true },
@@ -183,12 +170,14 @@
 
   $$('a[href^="#"]').forEach((link) => {
     link.addEventListener("click", (e) => {
-      const target = $(link.getAttribute("href"));
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
+      const target = $(href);
       if (!target) return;
       e.preventDefault();
       setNavState(false);
       smoothTo(target);
-      history.replaceState?.(null, "", link.getAttribute("href"));
+      history.replaceState?.(null, "", href);
     });
   });
 

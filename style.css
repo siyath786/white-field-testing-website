@@ -223,11 +223,13 @@ button {
 
 /* header */
 .fixed0 {
-  height: 88vh;
-  width: 100%;
+  height: auto;
+  width: auto;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: auto;
+  bottom: 20px;
+  left: auto;
+  right: 1.4%;
   z-index: 75;
   pointer-events: none;
 }
@@ -235,10 +237,8 @@ button {
   display: flex;
   pointer-events: none;
   flex-direction: column;
-  position: absolute;
+  position: static;
   gap: 25px;
-  bottom: 0px;
-  right: 1.4%;
 }
 .location {
   pointer-events: auto;
@@ -285,6 +285,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 90;
 }
 .brand {
   width: 170px;
@@ -340,7 +342,13 @@ button {
   background: transparent;
   width: 46px;
   height: 46px;
+  min-width: 46px;
+  min-height: 46px;
   padding: 8px;
+  position: relative;
+  z-index: 91;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .menu-toggle span {
   height: 2px;
@@ -1627,7 +1635,7 @@ button {
   .menu-toggle {
     display: block;
   }
-  .nav {
+    .nav {
     position: absolute;
     top: 110px;
     left: 16px;
@@ -1646,6 +1654,7 @@ button {
     visibility: hidden;
     transform: translateY(-8px);
     pointer-events: none;
+    z-index: 91;
   }
   .nav.open {
     opacity: 1;
@@ -1654,9 +1663,8 @@ button {
     pointer-events: auto;
   }
   .nav a {
-    height: auto;
-    padding: 13px 15px;
-    border-radius: 9px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .nav a:after {
     display: none;
@@ -2121,19 +2129,20 @@ body {
     margin-bottom: 15px;
   }
 
-  .fixed0 {
-    height: 90vh;
-    width: 100%;
+    .fixed0 {
+    height: auto;
+    width: auto;
     position: fixed;
-    top: 0px;
+    top: auto;
+    bottom: 20px;
+    right: 4%;
+    left: auto;
   }
   .fixedapp {
     display: flex;
     flex-direction: column;
-    position: absolute;
+    position: static;
     gap: 25px;
-    bottom: 0px;
-    right: 4%;
   }
   .customcake h3 {
     font-family: var(--serif);
