@@ -1417,8 +1417,8 @@ button {
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.167);
 }
 .footer-title1 img {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   border-radius: 50%;
   background: #fff;
@@ -1829,7 +1829,7 @@ button {
     align-items: center;
     justify-content: space-between;
   }
- 
+
   .hero-points div {
     flex: 1;
     min-width: 85px;
@@ -2156,7 +2156,7 @@ body {
     align-items: center;
     margin-bottom: 0;
   }
-  
+
   .fixed0 {
     height: 90vh;
     width: 100%;
