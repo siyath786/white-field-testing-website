@@ -1829,13 +1829,7 @@ button {
     align-items: center;
     justify-content: space-between;
   }
-  .brand {
-    width: 168px;
-    height: 58px;
-    z-index: 2;
-    position: relative;
-    bottom: 8px;
-  }
+ 
   .hero-points div {
     flex: 1;
     min-width: 85px;
@@ -2153,15 +2147,16 @@ body {
     min-width: 210px;
   }
   .brand {
-    width: 120px;
-    height: 120px;
-    z-index: 1;
+    width: 130px;
+    height: 130px;
+    z-index: 100;
     position: relative;
+    bottom: 8px;
     display: flex;
     align-items: center;
     margin-bottom: 0;
   }
-
+  
   .fixed0 {
     height: 90vh;
     width: 100%;
