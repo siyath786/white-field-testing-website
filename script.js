@@ -120,26 +120,49 @@
   const navLinks = $$(".nav a");
   const setNavState = (open) => {
     if (!nav || !menuToggle) return;
+    // iOS Safari fix: never let GSAP leave inline `visibility`/`opacity` on the
+    // nav. Inline styles from a killed autoAlpha tween used to leave the menu
+    // invisible / untappable on iPhone. State is now driven purely by the
+    // .open class; GSAP only animates opacity + transform.
+    if (hasGSAP) gsap.killTweensOf(nav);
+    nav.style.removeProperty("visibility");
+    nav.style.removeProperty("pointer-events");
     nav.classList.toggle("open", open);
     menuToggle.setAttribute("aria-expanded", String(open));
-    // Clear any GSAP inline styles so iOS uses CSS pointer-events/visibility
-    if (hasGSAP) {
-      gsap.killTweensOf(nav);
-      gsap.set(nav, {
-        clearProps: "opacity,visibility,transform,pointerEvents",
-      });
-      if (open && !reduced) {
+    menuToggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    document.body.classList.toggle("nav-open", open);
+
+    if (hasGSAP && !reduced) {
+      if (open) {
         gsap.fromTo(
           nav,
-          { y: -8 },
-          { y: 0, duration: 0.25, ease: "power2.out", overwrite: true },
+          { opacity: 0, y: -8 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.25,
+            ease: "power2.out",
+            overwrite: true,
+            clearProps: "opacity,transform",
+          },
         );
+      } else {
+        gsap.set(nav, { clearProps: "opacity,transform" });
       }
     }
   };
+
   menuToggle?.addEventListener("click", (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setNavState(!nav?.classList.contains("open"));
+  });
+
+  // Close the menu when tapping outside it (iPhone-friendly)
+  document.addEventListener("click", (e) => {
+    if (!nav?.classList.contains("open")) return;
+    if (nav.contains(e.target) || menuToggle?.contains(e.target)) return;
+    setNavState(false);
   });
 
   // Smooth navigation — includes ScrollToPlugin when GSAP is available.
@@ -151,13 +174,10 @@
       window.scrollY -
       (header?.offsetHeight || 0) -
       8;
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (hasScrollTo && !reduced && !isIOS) {
+    if (hasScrollTo && !reduced) {
       gsap.to(window, {
         duration: 1.05,
-        scrollTo: { y, autoKill: true },
+        scrollTo: { y, autoKill: false },
         ease: "power3.inOut",
       });
     } else {
@@ -172,12 +192,18 @@
     link.addEventListener("click", (e) => {
       const href = link.getAttribute("href");
       if (!href || href === "#") return;
-      const target = $(href);
-      if (!target) return;
+      let target = null;
+      try {
+        target = document.getElementById(href.slice(1)) || $(href);
+      } catch (err) {
+        target = null;
+      }
+      if (!target) return; // let the browser handle it natively
       e.preventDefault();
       setNavState(false);
-      smoothTo(target);
-      history.replaceState?.(null, "", href);
+      // Wait one frame so the closing menu doesn't change the layout mid-scroll
+      requestAnimationFrame(() => smoothTo(target));
+      if (history.replaceState) history.replaceState(null, "", href);
     });
   });
 
@@ -583,3 +609,4 @@
     init();
   }
 })();
+

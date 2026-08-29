@@ -20,13 +20,23 @@
 html {
   scroll-behavior: auto;
 }
+html {
+  -webkit-text-size-adjust: 100%;
+}
 body {
   margin: 0;
   color: var(--ink);
   background: #fff;
   font-family: var(--sans);
   line-height: 1.6;
-  overflow-x: hidden;
+  /* iOS Safari: `overflow-x: hidden` on body breaks position:sticky and the
+     hit-testing of everything inside the sticky header. `clip` avoids that. */
+  overflow-x: clip;
+}
+@supports not (overflow-x: clip) {
+  body {
+    overflow-x: hidden;
+  }
 }
 body.modal-open {
   overflow: hidden;
@@ -223,13 +233,11 @@ button {
 
 /* header */
 .fixed0 {
-  height: auto;
-  width: auto;
+  height: 88vh;
+  width: 100%;
   position: fixed;
-  top: auto;
-  bottom: 20px;
-  left: auto;
-  right: 1.4%;
+  top: 0;
+  left: 0;
   z-index: 75;
   pointer-events: none;
 }
@@ -237,8 +245,10 @@ button {
   display: flex;
   pointer-events: none;
   flex-direction: column;
-  position: static;
+  position: absolute;
   gap: 25px;
+  bottom: 0px;
+  right: 1.4%;
 }
 .location {
   pointer-events: auto;
@@ -272,21 +282,21 @@ button {
 }
 
 .site-header {
-  height: 124px;
+  min-height: 124px;
   background: rgba(255, 255, 255, 0.92);
   position: sticky;
   top: 0;
   z-index: 80;
   border-bottom: 1px solid rgba(195, 25, 63, 0.08);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+  overflow: visible;
 }
 .nav-wrap {
   height: 88px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
-  z-index: 90;
 }
 .brand {
   width: 170px;
@@ -342,13 +352,13 @@ button {
   background: transparent;
   width: 46px;
   height: 46px;
-  min-width: 46px;
-  min-height: 46px;
   padding: 8px;
   position: relative;
-  z-index: 91;
-  -webkit-tap-highlight-color: transparent;
+  z-index: 95;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .menu-toggle span {
   height: 2px;
@@ -1623,10 +1633,12 @@ button {
     width: min(100% - 32px, 650px);
   }
   .site-header {
-    height: 106px;
+    min-height: 106px;
+    height: auto;
   }
   .nav-wrap {
-    height: 74px;
+    min-height: 74px;
+    height: auto;
   }
   .brand {
     width: 150px;
@@ -1635,9 +1647,9 @@ button {
   .menu-toggle {
     display: block;
   }
-    .nav {
+  .nav {
     position: absolute;
-    top: 110px;
+    top: 100%;
     left: 16px;
     right: 16px;
     height: auto;
@@ -1654,7 +1666,6 @@ button {
     visibility: hidden;
     transform: translateY(-8px);
     pointer-events: none;
-    z-index: 91;
   }
   .nav.open {
     opacity: 1;
@@ -1662,9 +1673,17 @@ button {
     transform: none;
     pointer-events: auto;
   }
+  .nav {
+    z-index: 90;
+  }
   .nav a {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+  }
+  .nav a {
+    height: auto;
+    padding: 13px 15px;
+    border-radius: 9px;
   }
   .nav a:after {
     display: none;
@@ -2121,28 +2140,27 @@ body {
   }
   .brand {
     width: 140px;
-    height: 140px;
-    z-index: 2;
+    height: 56px;
+    z-index: 1;
     position: relative;
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 0;
   }
 
-    .fixed0 {
-    height: auto;
-    width: auto;
+  .fixed0 {
+    height: 90vh;
+    width: 100%;
     position: fixed;
-    top: auto;
-    bottom: 20px;
-    right: 4%;
-    left: auto;
+    top: 0px;
   }
   .fixedapp {
     display: flex;
     flex-direction: column;
-    position: static;
+    position: absolute;
     gap: 25px;
+    bottom: 0px;
+    right: 4%;
   }
   .customcake h3 {
     font-family: var(--serif);
@@ -2200,7 +2218,7 @@ body {
   }
 
   .nav {
-    top: 106px;
+    top: 100%;
   }
 }
 
@@ -2308,6 +2326,7 @@ body {
 }
 .site-header.scrolled {
   box-shadow: 0 10px 30px rgba(71, 22, 34, 0.12);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -2404,4 +2423,21 @@ body {
     padding: 14px 16px;
     font-size: 12.5px;
   }
+}
+
+
+/* --- iOS fixes: anchor offset + tap reliability --- */
+section[id],
+header[id] {
+  scroll-margin-top: 120px;
+}
+@media (max-width: 820px) {
+  section[id],
+  header[id] {
+    scroll-margin-top: 112px;
+  }
+}
+a,
+button {
+  -webkit-tap-highlight-color: rgba(195, 25, 63, 0.12);
 }
