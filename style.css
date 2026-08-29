@@ -2449,3 +2449,22 @@ a,
 button {
   -webkit-tap-highlight-color: rgba(195, 25, 63, 0.12);
 }
+
+/* cake card name/category text */
+.cake-meta {
+  padding: 16px 18px 16px;
+}
+.cake-meta .cake-cat {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.cake-meta .cake-name {
+  margin: 0;
+  font: 700 clamp(20px, 2vw, 26px)/1.15 var(--serif);
+  letter-spacing: -0.5px;
+  color: var(--ink);
+}
