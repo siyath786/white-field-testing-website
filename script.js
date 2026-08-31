@@ -8,10 +8,15 @@
     rows.forEach((row, index) => {
       row.style.scrollSnapType = "none";
 
+      // Row 2 begins at the cakes (left edge) and travels toward the nuts
+      // (right edge), looping cakes -> nuts continuously. Row 1 keeps the
+      // opposite travel direction it already had.
+      const rowTwo = index % 2 === 1;
       const state = {
-        dir: index % 2 === 0 ? 1 : -1, // row 1 moves content right->left, row 2 left->right
-        offset:
-          index % 2 === 0 ? 0 : Math.max(row.scrollWidth - row.clientWidth, 0),
+        dir: rowTwo ? 1 : -1,
+        offset: rowTwo
+          ? 0
+          : Math.max(row.scrollWidth - row.clientWidth, 0),
         last: performance.now(),
         paused: false,
       };
@@ -24,13 +29,12 @@
         const max = row.scrollWidth - row.clientWidth;
         if (max > 0 && !state.paused) {
           state.offset += state.dir * SPEED * dt;
-          if (state.offset >= max) {
-            state.offset = max;
-            state.dir = -1;
-          }
-          if (state.offset <= 0) {
-            state.offset = 0;
-            state.dir = 1;
+          if (rowTwo) {
+            // cakes -> nuts: once the nuts end is reached, wrap back to cakes.
+            if (state.offset >= max) state.offset = 0;
+          } else {
+            // end -> start: wrap back to the far end.
+            if (state.offset <= 0) state.offset = max;
           }
           row.scrollLeft = state.offset;
         }
@@ -406,8 +410,8 @@
           stagger: 0.075,
           ease: "power3.out",
           scrollTrigger: {
-            trigger: row,
-            start: "top 86%",
+            trigger: row.closest(".cake-rows") || row,
+            start: "top 92%",
             once: true,
           },
         },
@@ -584,7 +588,10 @@
       secondRow.classList.toggle("is-empty", visible === 0);
       secondRow.scrollLeft = 0;
       if (secondRow._marqueeState) {
+        // Row 2 always restarts at the first (cakes) end and travels
+        // toward the last (nuts) end.
         secondRow._marqueeState.offset = 0;
+        secondRow.scrollLeft = 0;
         secondRow._marqueeState.dir = 1;
         secondRow._marqueeState.last = performance.now();
       }
