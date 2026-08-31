@@ -1390,11 +1390,13 @@ button {
   width: 100%;
 }
 .footer-grid {
-  width: 85%;
-  display: grid;
-  grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  width: 75%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   gap: 20px;
 }
+
 .btn-primary1 {
   font-size: 50px;
   background: var(--red);
@@ -1446,16 +1448,17 @@ button {
 }
 .footer-item {
   display: flex;
+  flex-direction: column;
+  padding-left: 40px;
   gap: 14px;
   border-left: 1px solid rgba(255, 255, 255, 0.22);
-  padding-left: 25px;
 }
 .footer-icon {
   font-size: 25px;
   line-height: 1;
 }
-.footer-icon i {
-  font-size: 20px;
+.footer-label i {
+  font-size: 15px;
 }
 .footer-label {
   font-size: 9px;
@@ -1957,6 +1960,8 @@ button {
     grid-column: auto;
   }
   .footer-item {
+    margin-left: 10px;
+    width: 100%;
     border-left: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.18);
     padding: 22px 0 0;
@@ -1974,6 +1979,15 @@ button {
     gap: 20px;
     border-bottom: 0.5px solid rgba(255, 255, 255, 0.167);
     margin-top: 20px;
+  }
+  .footer-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 30px;
+    margin-left: 10px;
   }
 
   .footerpic {

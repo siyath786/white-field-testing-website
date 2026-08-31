@@ -1,8 +1,3 @@
-/* ---- Automatic back-and-forth slide for the two "Our Special" cake rows ----
-   Row 1 starts right -> left, row 2 starts left -> right; each row reverses
-   direction when it reaches an end, so both keep sliding both ways.
-   Hovering (desktop) or touching (mobile) a row pauses that row only;
-   touching a different row resumes the first one, just like hover does. */
 (() => {
   const SPEED = 55; // px per second — steady pace, not too fast or slow
 
