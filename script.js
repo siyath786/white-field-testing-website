@@ -635,6 +635,13 @@
         const show = filter === "all" || card.dataset.category === filter;
         card.classList.toggle("is-hidden", !show);
       });
+      // Hiding cards changes the page height, so every scroll-driven
+      // animation (section fades, parallax, progress bar) must be
+      // recalculated — otherwise the sections below the grid keep their
+      // stale positions and stay invisible.
+      if (typeof window.ScrollTrigger !== "undefined") {
+        window.ScrollTrigger.refresh();
+      }
     };
 
     chips.forEach((chip) => {
