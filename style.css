@@ -2125,6 +2125,24 @@ body {
     height: 500px;
     right: -18%;
   }
+  .top-banner {
+    height: 80px;
+    padding-top: 3px;
+  }
+  .top-banner-set {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-around;
+    padding: 0 20px;
+    gap: 12px;
+    flex-direction: column;
+  }
+
+  .top-banner-track span {
+    font-size: 14px;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 560px) {
@@ -2520,4 +2538,30 @@ button {
   font: 700 clamp(20px, 2vw, 26px)/1.15 var(--serif);
   letter-spacing: -0.5px;
   color: var(--ink);
+}
+
+/* ---- Grid version of the third row (duplicate, grid layout) ---- */
+.cake-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+  padding: 6px 8px 14px;
+  margin: -6px -8px -14px;
+}
+
+.cake-grid .product-card {
+  flex: none;
+  width: auto;
+}
+
+.cake-grid .product-card.is-hidden {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .cake-grid {
+    grid-template-columns: 1fr;
+    margin-left: 2px;
+  }
 }

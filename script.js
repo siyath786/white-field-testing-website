@@ -8,10 +8,10 @@
     rows.forEach((row, index) => {
       row.style.scrollSnapType = "none";
 
-      // Row 2 begins at the cakes (left edge) and travels toward the nuts
-      // (right edge), looping cakes -> nuts continuously. Row 1 keeps the
-      // opposite travel direction it already had.
-      const rowTwo = index % 2 === 1;
+      // Rows 2 and 3 begin at the cakes (left edge) and travel toward the
+      // nuts (right edge), looping cakes -> nuts continuously. Row 1 keeps
+      // the opposite travel direction it already had.
+      const rowTwo = index >= 1;
       const state = {
         dir: rowTwo ? 1 : -1,
         offset: rowTwo
@@ -572,8 +572,13 @@
 (() => {
   const init = () => {
     const chips = [...document.querySelectorAll(".row-filters .filter-chip")];
-    const rows = [...document.querySelectorAll(".cake-rows .cake-row")];
-    const secondRow = rows[1];
+    // Target the row that lives in the same .cake-rows container as the
+    // filter bar (the third row), not a hardcoded page-wide row index.
+    const filterBar = document.querySelector(".row-filters");
+    const secondRow =
+      filterBar && filterBar.nextElementSibling?.matches(".cake-row")
+        ? filterBar.nextElementSibling
+        : null;
     if (!chips.length || !secondRow) return;
     const cards = [...secondRow.querySelectorAll(".product-card")];
 
@@ -588,11 +593,15 @@
       secondRow.classList.toggle("is-empty", visible === 0);
       secondRow.scrollLeft = 0;
       if (secondRow._marqueeState) {
-        // Row 2 always restarts at the first (cakes) end and travels
-        // toward the last (nuts) end.
-        secondRow._marqueeState.offset = 0;
-        secondRow.scrollLeft = 0;
-        secondRow._marqueeState.dir = 1;
+        // Restart the row at the same end its marquee originally starts
+        // from: the first row travels end -> start, every later row
+        // travels cakes -> nuts.
+        const allRows = [...document.querySelectorAll(".cake-rows .cake-row")];
+        const rowTwo = allRows.indexOf(secondRow) >= 1;
+        const max = Math.max(secondRow.scrollWidth - secondRow.clientWidth, 0);
+        secondRow._marqueeState.dir = rowTwo ? 1 : -1;
+        secondRow._marqueeState.offset = rowTwo ? 0 : max;
+        secondRow.scrollLeft = secondRow._marqueeState.offset;
         secondRow._marqueeState.last = performance.now();
       }
     };
@@ -612,3 +621,33 @@
   }
 })();
 
+
+/* ---- Grid row category filter (fourth row only) ---- */
+(() => {
+  const init = () => {
+    const chips = [...document.querySelectorAll(".row-filters-grid .filter-chip")];
+    const grid = document.querySelector(".cake-grid");
+    if (!chips.length || !grid) return;
+    const cards = [...grid.querySelectorAll(".product-card")];
+
+    const apply = (filter) => {
+      cards.forEach((card) => {
+        const show = filter === "all" || card.dataset.category === filter;
+        card.classList.toggle("is-hidden", !show);
+      });
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((c) => c.classList.toggle("is-active", c === chip));
+        apply(chip.dataset.filter);
+      });
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
