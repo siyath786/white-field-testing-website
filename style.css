@@ -190,7 +190,7 @@ button {
   font-size: 30px;
 }
 .top-banner {
-  height: 36px;
+  height: 70px;
   background: var(--red-deep);
   color: #fff;
   overflow: hidden;
@@ -210,9 +210,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  width: 100vw;
   min-width: 100vw;
-  padding: 0 24px;
   flex-shrink: 0;
 }
 
@@ -221,7 +219,7 @@ button {
   align-items: center;
   gap: 7px;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 1.7px;
@@ -293,19 +291,18 @@ button {
   overflow: visible;
 }
 .nav-wrap {
-  height: 88px;
+  height: 95px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .brand {
-  width: 170px;
-  height: 170px;
+  width: 90px;
+  height: 90px;
   z-index: 2;
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
 }
 .brand img {
   width: 100%;
@@ -313,6 +310,18 @@ button {
   object-fit: contain;
   object-position: left center;
   filter: drop-shadow(0 7px 13px rgba(0, 0, 0, 0.12));
+}
+#brand1 {
+  width: 100px;
+  height: 100px;
+}
+.brand span {
+  color: white;
+  white-space: nowrap;
+  font-family: Mr Dafoe;
+  font-size: 45px;
+  -webkit-text-stroke: 1px black;
+  transform: translate(25px, 6px);
 }
 .nav {
   display: flex;
@@ -1453,6 +1462,14 @@ button {
   gap: 14px;
   border-left: 1px solid rgba(255, 255, 255, 0.22);
 }
+#footerborder {
+  display: flex;
+  flex-direction: column;
+  padding-left: 40px;
+  gap: 14px;
+  border-left: none;
+}
+
 .footer-icon {
   font-size: 25px;
   line-height: 1;
@@ -1472,6 +1489,13 @@ button {
   margin: 0 0 6px;
   color: rgba(255, 255, 255, 0.78);
 }
+#footerborder p {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
 .footer-item small {
   opacity: 0.7;
 }
@@ -1647,8 +1671,8 @@ button {
     height: auto;
   }
   .brand {
-    width: 150px;
-    height: 52px;
+    width: 85px;
+    height: 85px;
   }
   .menu-toggle {
     display: block;
@@ -1827,7 +1851,7 @@ button {
     gap: 18px;
   }
   .nav-wrap {
-    height: 70px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1963,9 +1987,17 @@ button {
     margin-left: 10px;
     width: 100%;
     border-left: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
     padding: 22px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
+  #footerborder {
+    margin-left: 10px;
+    width: 100%;
+    border-left: 0;
+    padding: 22px 0 0;
+    border-top: none;
+  }
+
   .footer-bottom {
     flex-direction: column;
     gap: 7px;
@@ -2161,16 +2193,22 @@ body {
     min-width: 210px;
   }
   .brand {
-    width: 130px;
-    height: 130px;
+    width: 80px;
+    height: 80px;
     z-index: 100;
     position: relative;
-    bottom: 8px;
     display: flex;
     align-items: center;
     margin-bottom: 0;
   }
-
+  .brand span {
+    color: white;
+    white-space: nowrap;
+    font-family: Mr Dafoe;
+    font-size: 25px;
+    -webkit-text-stroke: 1px black;
+    transform: translate(10px, 6px);
+  }
   .fixed0 {
     height: 90vh;
     width: 100%;
@@ -2214,7 +2252,8 @@ body {
   }
 
   .top-banner {
-    height: 32px;
+    height: 80px;
+    padding-top: 3px;
   }
 
   .top-banner-track {
@@ -2230,12 +2269,12 @@ body {
     min-width: 0;
     justify-content: space-around;
     padding: 0 20px;
-    gap: 8px;
+    gap: 12px;
     flex-direction: column;
   }
 
   .top-banner-track span {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 0.8px;
     white-space: nowrap;
   }
