@@ -320,8 +320,13 @@ button {
   white-space: nowrap;
   font-family: Mr Dafoe;
   font-size: 45px;
-  -webkit-text-stroke: 1px black;
+  -webkit-text-stroke: 1.5px black;
   transform: translate(25px, 6px);
+}
+#brand2 {
+  color: white;
+  -webkit-text-stroke: 1.5px var(--red);
+  margin-left: 1px;
 }
 .nav {
   display: flex;
@@ -330,7 +335,7 @@ button {
   height: 100%;
 }
 .nav a {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   position: relative;
   height: 100%;
@@ -701,6 +706,7 @@ button {
 .menu-container {
   width: min(1660px, calc(100% - 64px));
   margin-inline: auto;
+  transform: translateY(-80px);
 }
 
 .menu-heading {
@@ -2223,9 +2229,14 @@ body {
     color: white;
     white-space: nowrap;
     font-family: Mr Dafoe;
-    font-size: 25px;
+    font-size: 28px;
     -webkit-text-stroke: 1px black;
     transform: translate(10px, 6px);
+  }
+  #brand2 {
+    color: white;
+    -webkit-text-stroke: 1px var(--red);
+    margin-left: 1px;
   }
   .fixed0 {
     height: 90vh;
