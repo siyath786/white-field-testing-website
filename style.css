@@ -706,7 +706,6 @@ button {
 .menu-container {
   width: min(1660px, calc(100% - 64px));
   margin-inline: auto;
-  transform: translateY(-80px);
 }
 
 .menu-heading {
@@ -2576,3 +2575,22 @@ button {
     margin-left: 2px;
   }
 }
+
+/* tighter spacing: hero -> our special -> story */
+.menu-section.section {
+  padding-top: 0;
+  padding-bottom: 50px;
+}
+.story.section {
+  padding-top: 30px;
+}
+@media (max-width: 700px) {
+  .menu-section.section {
+    padding-top: 0;
+    padding-bottom: 36px;
+  }
+  .story.section {
+    padding-top: 24px;
+  }
+}
+
