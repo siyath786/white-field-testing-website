@@ -658,3 +658,29 @@
     init();
   }
 })();
+
+/* ---- Scroll to top button ---- */
+(() => {
+  const init = () => {
+    const btn = document.getElementById("scrollTopBtn");
+    if (!btn) return;
+
+    const onScroll = () => {
+      const scrolled = window.scrollY || document.documentElement.scrollTop;
+      btn.classList.toggle("is-visible", scrolled > 300);
+    };
+
+    btn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
